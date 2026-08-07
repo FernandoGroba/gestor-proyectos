@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+
+# Entorno virtual
+.venv/
+
+# Almacenamiento de desarrollo de Flet
+.flet/
+
+# Builds / empaquetado
+dist/
+build/
+*.spec
+
+# Datos generados por la app
+presupuestos/
+presupuesto_prueba.pdf
+*.db
+
+# Datos fuente personales (no subir a GitHub)
+Gestor de Proyectos y gastos Freelance.xlsx
