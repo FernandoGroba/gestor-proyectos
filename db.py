@@ -15,7 +15,17 @@ def init_db():
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row
 
-    conn.execute("CREATE TABLE IF NOT EXISTS proyecto (id INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT, descripcion TEXT, cliente TEXT, valor_hora REAL, horas REAL, aprobado INTEGER)")
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS proyecto (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT,
+            descripcion TEXT,
+            cliente TEXT,
+            valor_hora REAL,
+            horas REAL,
+            aprobado INTEGER   -- 0 = No Aprobado, 1 = Aprobado, 2 = Pendiente
+        )
+    """)
     conn.execute("CREATE TABLE IF NOT EXISTS config (key TEXT PRIMARY KEY, value TEXT)")
     conn.commit()
 
@@ -31,10 +41,10 @@ def init_db():
 def insertar_proyecto(datos):
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row
-
     nuevo_id = conn.execute(
         "INSERT INTO proyecto (nombre, descripcion, cliente, valor_hora, horas, aprobado) VALUES (?, ?, ?, ?, ?, ?)",
-        (datos["nombre"], datos["descripcion"], datos["cliente"], datos["valor_hora"], datos["horas"], datos["aprobado"]),
+        (datos["nombre"], datos["descripcion"], datos["cliente"],
+         datos["valor_hora"], datos["horas"], datos["aprobado"]),
     ).lastrowid
     conn.commit()
     conn.close()
@@ -46,9 +56,9 @@ def list_proyectos(filtro=None):
     conn.row_factory = sqlite3.Row
 
     if filtro is None or filtro == "todas":
-        filas = conn.execute("SELECT * FROM proyecto").fetchall()
+        filas = conn.execute("SELECT * FROM proyecto ORDER BY id DESC").fetchall()
     else:
-        filas = conn.execute("SELECT * FROM proyecto WHERE aprobado = ?", (filtro,)).fetchall()
+        filas = conn.execute("SELECT * FROM proyecto WHERE aprobado = ? ORDER BY id DESC", (filtro,)).fetchall()
 
     conn.close()
     return [dict(fila) for fila in filas]
@@ -65,10 +75,10 @@ def get_proyecto(id):
 def update_proyecto(id, datos):
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row
-
     conn.execute(
         "UPDATE proyecto SET nombre = ?, descripcion = ?, cliente = ?, valor_hora = ?, horas = ?, aprobado = ? WHERE id = ?",
-        (datos["nombre"], datos["descripcion"], datos["cliente"], datos["valor_hora"], datos["horas"], datos["aprobado"], id),
+        (datos["nombre"], datos["descripcion"], datos["cliente"],
+         datos["valor_hora"], datos["horas"], datos["aprobado"], id),
     )
     conn.commit()
     conn.close()
